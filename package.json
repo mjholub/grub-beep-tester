@@ -1,0 +1,19 @@
+{
+  "name": "grub-beep-tester",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@elysiajs/static": "^1.0.3",
+    "elysia": "^1.0.18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
