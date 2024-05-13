@@ -1,32 +1,39 @@
 import { Elysia } from 'elysia';
+import { staticPlugin } from '@elysiajs/static';
 import { html } from '@elysiajs/html';
+import { renderToString } from 'react-dom/server';
+// @ts-ignore
 import { renderToStringAsync } from 'react-async-ssr';
-import BeepSimulator from './src/components/simulator';
+import { BeepSimulator } from './src/components/simulator';
 
 const app = new Elysia().
-  use(html())
+  use(staticPlugin({ assets: './src' })).
+  use(html());
 
 const PORT = process.env.PORT || 4200;
 
-app.get("/", async () => {
-  return new Promise(async (resolve, reject) => {
-    const appBody = await renderToStringAsync(await BeepSimulator());
+const rendered = renderToStringAsync(BeepSimulator());
+const component = await Bun.file('./src/components/simulator.jsx').text().then((data) => renderToString(data))
 
-    const content = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>GRUB Beep Simulator</title>
-        </head>
-        <body>
-          <div id="root">${appBody}</div>
-          <script src="/bundle.js"></script>
-        </body>
-      </html>
-    `;
+const htmlData = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/style.css">
+  </head>
+  <body>
+    <div id="root">
+      ${rendered}
+</div>
+  </body>
+</html>
+`
 
-    resolve(content);
-  });
-});
+app.get("/", () => {
+  return htmlData;
+})
+  .get("/static/style.css", () => Bun.file('./src/static/style.css'));
 
 app.listen(PORT);
